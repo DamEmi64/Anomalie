@@ -23,6 +23,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Anomalie.py" />
+    <Compile Include="riverA.py" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="data\" />

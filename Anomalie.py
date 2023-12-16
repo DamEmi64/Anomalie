@@ -1,6 +1,7 @@
 import os
 import numpy as np
 import pywt
+import ADwin
 import matplotlib.image as img
 import matplotlib.pyplot as plt
 from math import ceil
@@ -69,6 +70,7 @@ def train_models(con, data):
 
     return model
 
+[
 
 def anomaly_detect(model, test_data):
     anomaly_scores = []
@@ -80,7 +82,7 @@ def anomaly_detect(model, test_data):
 def Run_model(name, path, con):
     print('--- ' + name + ' ---')
     data = readfile(path)
-
+    A
     print('generate figures')
     GenerateDWTFigures(path, data)
 
