@@ -1,103 +1,102 @@
-import os
 import numpy as np
-import pywt
-import ADwin
-import matplotlib.image as img
-import matplotlib.pyplot as plt
-from math import ceil
-from sklearn.ensemble import IsolationForest
+import sklearn.datasets
+from sklearn.linear_model import LogisticRegression
+from sklearn.model_selection import train_test_split
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import StandardScaler
 
-pattern_swap_change_halfway = './data/pattern_swap/change_halfway'
-bitrate_fluctuation_change_halfway = './data/bitrate_fluctuation/change_halfway'
-sum_diff_change_halfway = './data/sum_diff/change_halfway'
-pattern_swap_change_three_quarters = './data/pattern_swap/change_three_quarters'
-bitrate_fluctuation_change_three_quarters = './data/bitrate_fluctuation/change_three_quarters'
-sum_diff_change_three_quarters = './data/sum_diff/change_three_quarters'
+from frouros.detectors.concept_drift import DDM, DDMConfig
+from frouros.metrics import PrequentialError
 
 
-def readfile(folder_path):
-    data = []
-    for foldername, subfolders, filenames in os.walk(folder_path):
-        for filename in filenames:
-            file_path = os.path.join(foldername, filename)
-            with open(file_path, 'r') as infile:
-                buf = [file_path, list(map(float, infile.read().splitlines()))]
-                data.append(buf)
-    return data
+data = sklearn.datasets.load_files('./data/dataset')
+x = []
+y = data.target
+for item in data.data:
+    lines = item.splitlines()
+    numbers = []
+    for line in lines:
+        if len(numbers)<200:
+            try:
+                numbers.append(float(line))
+            except :
+                pass
+    x.append(numbers)
+(
+    X_train,
+    X_test,
+    y_train,
+    y_test,
+) = train_test_split(x, y, train_size=0.7, random_state=31)
 
+# Define and fit model
+pipeline = Pipeline(
+    [
+        ("scaler", StandardScaler()),
+        ("model", LogisticRegression()),
+    ]
+)
+pipeline.fit(X=X_train, y=y_train)
 
-def divide_chunks(array, n):
-    size = ceil(len(array) / n)
-    return list(
-        map(lambda x: array[x * size:x * size + size],
-        list(range(n)))
-    )
+# Detector configuration and instantiation
+config = DDMConfig(
+    warning_level=2.0,
+    drift_level=3.0,
+    min_num_instances=25,  # minimum number of instances before checking for concept drift
+)
+detector = DDM(config=config)
 
+# Metric to compute accuracy
+metric = PrequentialError(alpha=1.0)  # alpha=1.0 is equivalent to normal accuracy
 
-def DWT(data):
-    coeffs = pywt.dwt(data, 'haar')
-    return coeffs
+def stream_test(X_test, y_test, y, metric, detector):
+    """Simulate data stream over X_test and y_test. y is the true label."""
+    drift_flag = False
+    for i, (X, y) in enumerate(zip(X_test, y_test)):
+        y_pred = pipeline.predict(np.array(X).reshape(1, -1))
+        error = 1 - (y_pred.item() == y.item())
+        metric_error = metric(error_value=error)
+        _ = detector.update(value=error)
+        status = detector.status
+        if status["drift"] and not drift_flag:
+            drift_flag = True
+            print(f"Concept drift detected at step {i}. Accuracy: {1 - metric_error:.4f}")
+    if not drift_flag:
+        print("No concept drift detected")
+    print(f"Final accuracy: {1 - metric_error:.4f}\n")
 
+# Simulate data stream (assuming test label available after each prediction)
+# No concept drift is expected to occur
+stream_test(
+    X_test=X_test,
+    y_test=y_test,
+    y=y,
+    metric=metric,
+    detector=detector,
+)
+# >> No concept drift detected
+# >> Final accuracy: 0.9766
 
-def GenerateDWTFigures(path, data_files):
-    if not os.path.isdir('./images' + path):
-        os.makedirs('./images' + path)
-    i = 0
+# IMPORTANT: Induce/simulate concept drift in the last part (20%)
+# of y_test by modifying some labels (50% approx). Therefore, changing P(y|X))
+drift_size = int(y_test.shape[0] * 0.2)
+y_test_drift = y_test[-drift_size:]
+modify_idx = np.random.rand(*y_test_drift.shape) <= 0.5
+y_test_drift[modify_idx] = (y_test_drift[modify_idx] + 1) % len(np.unique(y_test))
+y_test[-drift_size:] = y_test_drift
 
-    for x, data in data_files:
-        coeffs = DWT(data)
-        plt.xlabel('sample')
-        plt.ylabel('cD')
-        plt.plot(coeffs[1])
-        plt.title(str(i))
-        plt.savefig(os.path.abspath('./images' + path + '/' + str(i)))
-        plt.clf()
-        i += 1
+# Reset detector and metric
+detector.reset()
+metric.reset()
 
-
-def transform_data(array_of_data):
-    models = []
-    for x, data in array_of_data:
-        models.append(np.array(data).reshape(-1,1))
-
-    return models
-
-
-def train_models(con, data):
-    model = IsolationForest(contamination=con)
-    for simple_data in data:
-        model.fit(simple_data)
-
-    return model
-
-[
-
-def anomaly_detect(model, test_data):
-    anomaly_scores = []
-    for data in test_data:
-        anomaly_scores.append(model.decision_function(data))
-    return anomaly_scores
-
-
-def Run_model(name, path, con):
-    print('--- ' + name + ' ---')
-    data = readfile(path)
-    A
-    print('generate figures')
-    GenerateDWTFigures(path, data)
-
-    print('generate test and train data')
-    train, test = divide_chunks(data, 2)
-    train_transformed = transform_data(train)
-    test_transformed = transform_data(test)
-    print('train model and detect anomaly')
-    model = train_models(con, train_transformed)
-    print(anomaly_detect(model, test_transformed))
-
-
-Run_model('pattern_swap_change_halfway', pattern_swap_change_halfway, 0.5)
-Run_model('bitrate_fluctuation_change_halfway', bitrate_fluctuation_change_halfway, 0.5)
-Run_model('sum_diff_change_halfway', sum_diff_change_halfway, 0.5)
-Run_model('pattern_swap_change_three_quarters', pattern_swap_change_three_quarters, 0.3)
-Run_model('bitrate_fluctuation_change_three_quarters', bitrate_fluctuation_change_three_quarters, 0.3)
-Run_model('sum_diff_change_three_quarters', sum_diff_change_three_quarters, 0.3)
+# Simulate data stream (assuming test label available after each prediction)
+# Concept drift is expected to occur because of the label modification
+stream_test(
+    X_test=X_test,
+    y_test=y_test,
+    y=y,
+    metric=metric,
+    detector=detector,
+)
+# >> Concept drift detected at step 142. Accuracy: 0.9510
+# >> Final accuracy: 0.8480
