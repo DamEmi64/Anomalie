@@ -57,7 +57,7 @@ def GenerateDWTFigures(path, data_files):
 def transform_data(array_of_data):
     models = []
     for x, data in array_of_data:
-        models.append(np.apply_along_axis(DWT, axis=0, arr=data))
+        models.append(np.array(data).reshape(-1,1))
 
     return models
 
