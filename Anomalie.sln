@@ -1,0 +1,23 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.8.34322.80
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "Anomalie", "Anomalie.pyproj", "{1B608D5B-7C5F-452E-ADAA-C21B7836E675}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{1B608D5B-7C5F-452E-ADAA-C21B7836E675}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1B608D5B-7C5F-452E-ADAA-C21B7836E675}.Release|Any CPU.ActiveCfg = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {F66547DD-FF4C-4740-8502-138B995DF1AB}
+	EndGlobalSection
+EndGlobal
