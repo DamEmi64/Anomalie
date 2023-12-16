@@ -1,3 +1,4 @@
+'''
 import os
 import numpy as np
 import pywt
@@ -147,3 +148,4 @@ def Run_model(name, path_concept,path_no_concept, con = 0.5):
 
 
 main()
+'''
