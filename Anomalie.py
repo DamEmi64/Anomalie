@@ -1,9 +1,10 @@
 import os
-from turtle import color
 import numpy as np
 import pywt
 import matplotlib.image  as img
 import matplotlib.pyplot as plt
+from math import ceil
+from sklearn.ensemble import IsolationForest
 
 pattern_swap_change_halfway = './data/pattern_swap/change_halfway'
 bitrate_fluctuation_change_halfway ='./data/bitrate_fluctuation/change_halfway'
@@ -22,31 +23,73 @@ def readfile(folder_path):
               data.append(buf)
     return data    
 
-def DWT(path,data_files):
+def divide_chunks(array, n): 
+    
+    size = ceil(len(array) / n)
+    return list(
+        map(lambda x: array[x * size:x * size + size],
+        list(range(n)))
+    )
+
+def DWT(data):
+    coeffs = pywt.dwt(data, 'haar')
+    return coeffs
+
+def GenerateDWTFigures(path,data_files):
     if not os.path.isdir('./images'+path):
         os.makedirs('./images'+path)
-        
     i = 0
+    
     for x, data in data_files:
-        cA,cD = pywt.dwt(data, 'db1')
+        coeffs = DWT(data)
         plt.xlabel('sample')
         plt.ylabel('cD')
-        plt.plot(cD)
+        plt.plot(coeffs[1])
         plt.title(str(i))
         plt.savefig(os.path.abspath('./images'+path+'/'+str(i)))
         plt.clf()
         i+=1
 
+def transform_data(array_of_data):
+    models = []
+    for x,data in array_of_data:
+        models.append(np.apply_along_axis(DWT,axis=0,arr=data))
         
-print('generate pattern_swap_change_halfway')        
-DWT(pattern_swap_change_halfway,readfile(pattern_swap_change_halfway))
-print('generate bitrate_fluctuation_change_halfway')     
-DWT(bitrate_fluctuation_change_halfway,readfile(bitrate_fluctuation_change_halfway))
-print('generate sum_diff_change_halfway')     
-DWT(sum_diff_change_halfway,readfile(sum_diff_change_halfway))
-print('generate pattern_swap_change_three_quarters')     
-DWT(pattern_swap_change_three_quarters,readfile(pattern_swap_change_three_quarters))
-print('generate bitrate_fluctuation_change_three_quarters')     
-DWT(bitrate_fluctuation_change_three_quarters,readfile(bitrate_fluctuation_change_three_quarters))
-print('generate sum_diff_change_three_quarters')     
-DWT(sum_diff_change_three_quarters,readfile(sum_diff_change_three_quarters))
+    return models
+        
+def train_models(con,data):
+    model = IsolationForest(contamination=con)   
+    for simple_data in data:
+        model.fit(simple_data)
+        
+    return model
+
+def anomaly_detect(model,test_data):
+    anomaly_scores = []
+    for data in test_data:
+        anomaly_scores.append(model.decision_function(data))        
+    return anomaly_scores
+
+def Run_model(name,path,con): 
+    
+    print('--- '+ name +' ---')
+    data = readfile(path)
+    
+    print('generate figures')     
+    GenerateDWTFigures(path,data)
+    
+    print('generate test and train data')   
+    train, test = divide_chunks(data,2)
+    train_transformed = transform_data(train)
+    test_transformed = transform_data(test)
+    print('train model and detect anomaly')   
+    model = train_models(con,train_transformed)
+    print(anomaly_detect(model,test_transformed))
+
+
+Run_model('pattern_swap_change_halfway',pattern_swap_change_halfway,0.5)   
+Run_model('bitrate_fluctuation_change_halfway',bitrate_fluctuation_change_halfway,0.5) 
+Run_model('sum_diff_change_halfway',sum_diff_change_halfway,0.5)
+Run_model('pattern_swap_change_three_quarters',pattern_swap_change_three_quarters,0.3)   
+Run_model('bitrate_fluctuation_change_three_quarters',bitrate_fluctuation_change_three_quarters,0.3) 
+Run_model('sum_diff_change_three_quarters',sum_diff_change_three_quarters,0.3)
