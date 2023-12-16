@@ -1,7 +1,3 @@
-# format: from_node, to_node, traffic - demand bitrates in each iteration
-4
-2
-241.9140195337469
 239.3379746928397
 241.19266640485284
 241.36023313268953
