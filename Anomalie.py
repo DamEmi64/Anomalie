@@ -4,6 +4,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 import pywt
+import math
 import numpy as np
 import sklearn.datasets
 import scipy.stats
@@ -30,15 +31,8 @@ for item in data.data:
     label_for_test,
 ) = train_test_split(x, y, train_size=0.7, random_state=31)
 
-def calculate_entropy(list_values):
-    counter_values = Counter(list_values).most_common()
-    probabilities = [elem[1]/len(list_values) for elem in counter_values]
-    entropy=scipy.stats.entropy(probabilities)
-    return entropy
-
 def get_features(list_values):
-    entropy = calculate_entropy(list_values)
-    return [entropy]
+    return [scipy.stats.entropy(list_values)] + [np.mean(list_values)] + [np.std(list_values)]
 
 
 def transform_data(data,label):
@@ -50,6 +44,7 @@ def transform_data(data,label):
         features = []
         for coeff in list_coeff:
             features += get_features(coeff)
+        features = [v for v in features if not math.isinf(v)]
         list_features.append(features)
     return list_features,list_labels
 
