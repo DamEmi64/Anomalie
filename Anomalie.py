@@ -1,15 +1,11 @@
-from collections import Counter
+import math
+
+import numpy as np
+import pywt
+import scipy.stats
+import sklearn.datasets
 from sklearn.ensemble import GradientBoostingClassifier
 from sklearn.model_selection import train_test_split
-from sklearn.pipeline import Pipeline
-from sklearn.preprocessing import StandardScaler
-import pywt
-import math
-import numpy as np
-import sklearn.datasets
-import scipy.stats
-from frouros.detectors.concept_drift import DDM, DDMConfig
-from frouros.metrics import PrequentialError
 
 data = sklearn.datasets.load_files('./data/dataset')
 
@@ -19,25 +15,20 @@ for item in data.data:
     lines = item.splitlines()
     numbers = []
     for line in lines:
-            try:
-                numbers.append(float(line))
-            except :
-                pass
+        try:
+            numbers.append(float(line))
+        except:
+            pass
     x.append(numbers)
 
-(
-    data_for_train,
-    data_for_test,
-    label_for_train,
-    label_for_test,
-) = train_test_split(x, y, train_size=0.7, random_state=31)
 
 def get_features(list_values):
+    # return [scipy.stats.entropy(list_values)] + [np.mean(list_values)] + [np.std(list_values)]
+    return [np.var(list_values)] + [scipy.stats.skew(list_values)] + [scipy.stats.kurtosis(list_values)] + [
+        np.sum(np.diff(list_values)[1:] * np.diff(list_values)[:-1] < 0)]
 
-    return [scipy.stats.entropy(list_values)] + [np.mean(list_values)] + [np.std(list_values)]
 
-
-def transform_data(data,label):
+def transform_data(data, label):
     list_features = []
     list_unique_labels = list(set(label))
     list_labels = [list_unique_labels.index(elem) for elem in label]
@@ -48,19 +39,37 @@ def transform_data(data,label):
             features += get_features(coeff)
         features = [v for v in features if not math.isinf(v)]
         list_features.append(features)
-    return list_features,list_labels
-
-x_train, y_train = transform_data(data_for_train,label_for_train)
-x_test, y_test = transform_data(data_for_test,label_for_test)
-
-cls = GradientBoostingClassifier(n_estimators=2000)
-cls.fit(x_train, y_train)
-train_score = cls.score(x_train, y_train)
-test_score = cls.score(x_test, y_test)
-print("Train Score for the dataset is about: {}".format(train_score))
-print("Test Score for the dataset is about: {}".format(test_score))
+    return list_features, list_labels
 
 
+# train_scores = []
+test_scores = []
+
+print("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
+for i in range(10):
+    (
+        data_for_train,
+        data_for_test,
+        label_for_train,
+        label_for_test,
+    ) = train_test_split(x, y, train_size=0.7)
+    # ) = train_test_split(x, y, train_size=0.7, random_state=31)
+
+    x_train, y_train = transform_data(data_for_train, label_for_train)
+    x_test, y_test = transform_data(data_for_test, label_for_test)
+
+    cls = GradientBoostingClassifier(n_estimators=2000)
+    cls.fit(x_train, y_train)
+    # train_score = cls.score(x_train, y_train) # always 1.0
+    test_score = cls.score(x_test, y_test)
+    # train_scores.append(train_score) # always 1.0
+    test_scores.append(test_score)
+    # print("Train Score for the dataset is about: {}".format(train_score)) # always 1.0
+    print("Test Score for the dataset is about: {}".format(test_score))
+    print("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
+
+# print("Average train Score for the dataset is about: {}".format(np.mean(train_scores))) # always 1.0
+print("Average test Score for the dataset is about: {}".format(np.mean(test_scores)))
 
 '''
 
