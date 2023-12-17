@@ -12,18 +12,19 @@ from frouros.detectors.concept_drift import DDM, DDMConfig
 from frouros.metrics import PrequentialError
 
 data = sklearn.datasets.load_files('./data/dataset')
+
 x = []
 y = data.target
 for item in data.data:
     lines = item.splitlines()
     numbers = []
     for line in lines:
-        if len(numbers)<200:
             try:
                 numbers.append(float(line))
             except :
                 pass
     x.append(numbers)
+
 (
     data_for_train,
     data_for_test,
@@ -32,6 +33,7 @@ for item in data.data:
 ) = train_test_split(x, y, train_size=0.7, random_state=31)
 
 def get_features(list_values):
+
     return [scipy.stats.entropy(list_values)] + [np.mean(list_values)] + [np.std(list_values)]
 
 
