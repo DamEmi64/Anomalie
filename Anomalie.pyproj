@@ -23,7 +23,8 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Anomalie.py" />
-    <Compile Include="riverA.py" />
+    <Compile Include="fullClassifier.py" />
+    <Compile Include="SimpleClassifier.py" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="data\" />
