@@ -8,6 +8,7 @@ from sklearn.model_selection import train_test_split
 
 from SimpleClassifier import SimpleClassifier
 from fullClassifier import FullClassifier
+from halfWindowClassifier import HalfWindowClassifier
 
 while True:
     print("1.Ucz model - wersja prosta")
@@ -20,6 +21,7 @@ while True:
     elif user == '2':
         FullClassifier().run()
     elif user == '3':
+        HalfWindowClassifier().run()
         pass
     elif user == '4':
         break

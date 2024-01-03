@@ -24,6 +24,7 @@
   <ItemGroup>
     <Compile Include="Anomalie.py" />
     <Compile Include="fullClassifier.py" />
+    <Compile Include="halfWindowClassifier.py" />
     <Compile Include="SimpleClassifier.py" />
   </ItemGroup>
   <ItemGroup>
