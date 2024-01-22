@@ -38,6 +38,7 @@
     <Folder Include="data\sum_diff\" />
     <Folder Include="data\sum_diff\change_halfway\" />
     <Folder Include="data\sum_diff\change_three_quarters\" />
+    <Folder Include="Results\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="data\bitrate_fluctuation\.DS_Store" />

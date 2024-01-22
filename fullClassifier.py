@@ -14,24 +14,8 @@ from frouros.detectors.concept_drift import DDM, DDMConfig
 from frouros.metrics import PrequentialError
 
 class FullClassifier:
-   
-    def readData(train_size = 0.7):
-        data = sklearn.datasets.load_files('./data/dataset')
-        x = []
-        y = data.target
-        for item in data.data:
-            lines = item.splitlines()
-            numbers = []
-            for line in lines:
-                    try:
-                        numbers.append(float(line))
-                    except :
-                        pass
-            x.append(numbers)
-
-        return train_test_split(x, y, train_size=train_size)
-
-    def get_features(list_values):
+    
+    def get_features(self,list_values):
         return [np.var(list_values)] + [scipy.stats.skew(list_values)] + [scipy.stats.kurtosis(list_values)] + [
             np.sum(np.diff(list_values)[1:] * np.diff(list_values)[:-1] < 0)]
 
@@ -49,16 +33,18 @@ class FullClassifier:
             list_features.append(features)
         return list_features,list_labels
     
-    def run(self):
+    def run(self, x, y, coma):
         train_scores = []
         test_scores = []
-        print("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
+        result = 'SimpleClassifier' + coma + coma + coma + coma + '\n'
+        result += 'Lp' + coma + 'train score' + coma + 'test score\n'
         (
             data_for_train,
             data_for_test,
             label_for_train,
             label_for_test,
-        ) = self.readData()        
+        ) = train_test_split(x, y, train_size=0.7)       
+        print("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")    
 
         for i in range(10):
 
@@ -71,13 +57,17 @@ class FullClassifier:
             test_score = cls.score(x_test, y_test)
             train_scores.append(train_score) # always 1.0
             test_scores.append(test_score)
+            result += str(i) + coma +  str(train_score)+coma+str(test_score)+'\n' 
             print("Train Score for the dataset is about: {}".format(train_score)) # always 1.0
             print("Test Score for the dataset is about: {}".format(test_score))
             print("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
 
-        # print("Average train Score for the dataset is about: {}".format(np.mean(train_scores))) # always 1.0
-        print("Average test Score for the dataset is about: {}".format(np.mean(test_scores)))
+        print("Average train Score for the dataset is about: {}".format(np.mean(train_scores))) # always 1.0
+        print("Average test Score for the dataset is about: {}".format(np.mean(test_scores)))        
+        file = open('./Result/FullClassifier.csv', 'w+')
+        file.write(result)
         
+        return test_scores
 
 
 
