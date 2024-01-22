@@ -54,7 +54,8 @@ while True:
     print("1.Ucz model - wersja prosta")
     print("2.Ucz model - wersja zaawansowana")
     print("3.Ucz model - ograniczone okno")
-    print("4.Zamknij program")
+    print("4.Ucz wszystkie modele")
+    print("5.Zamknij program")
     user = input("")
     if user == '1':
         results_simple = SimpleClassifier().run(dataset_x,dataset_y,coma_csv)
@@ -64,5 +65,15 @@ while True:
         results_half = HalfWindowClassifier().run(dataset_x,dataset_y,coma_csv)
         pass
     elif user == '4':
+        print('Simple Classifier')
+        results_simple = SimpleClassifier().run(dataset_x,dataset_y,coma_csv)
+        print('Full Classifier')
+        results_full = FullClassifier().run(dataset_x,dataset_y,coma_csv)
+        print('Half Window Classifier')
+        results_half = HalfWindowClassifier().run(dataset_x,dataset_y,coma_csv)
+        print("Saving data to compare...")
+        SaveToCSV()
+        print("Data saved")
+    elif user == '5':
         SaveToCSV()
         break
