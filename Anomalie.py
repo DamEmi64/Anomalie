@@ -29,15 +29,20 @@ def readData():
     return x, y
 
 def SaveToCSV():
-    result = 'Lp' + coma_csv + 'simple' + coma_csv + 'full' + coma_csv + 'half window\n'
-    for i in range(0,len(results_simple)):
+    result = 'Lp' + coma_csv + 'simple - balanced' + coma_csv + 'simple - mean' + coma_csv + 'full - balanced' + coma_csv + 'full - mean' + coma_csv + 'half window - balanced' + coma_csv + 'half window - mean' + '\n'
+    for i in range(0,len(results_simple_balanced)):
         result_full = '-'
-        if i < len(results_full):
-            result_full[i]
+        result_full_mean = '-'
+        if i < len(results_full_balanced):
+            result_full = results_full_balanced[i]
+            result_full_mean = results_full_mean[i]
         result_half = '-'
-        if i < len(results_half):
-            results_half[i]
-        result+=str(i) + coma_csv + str(results_simple[i]) + coma_csv + str(result_full) + coma_csv + str(result_half) + '\n'
+        result_half_mean = '-'
+        if i < len(results_half_balanced):
+            result_half = results_half_balanced[i]
+            result_half_mean = results_half_mean[i]
+            
+        result+=str(i) + coma_csv + str(results_simple_balanced[i]) + coma_csv + str(results_simple_mean[i]) + coma_csv + str(result_full) + coma_csv + str(result_full_mean) + coma_csv + str(result_half) + coma_csv + str(result_half_mean) + '\n'
     file = open('./Result/Results.csv', 'w+')
     file.write(result)
 
@@ -46,9 +51,12 @@ dataset_x, dataset_y = readData()
 print('Data loaded')
 print("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")   
 
-results_simple = []
-results_half = []
-results_full = []
+results_simple_balanced = []
+results_full_balanced = []
+results_half_balanced = []
+results_simple_mean = []
+results_full_mean = []
+results_half_mean = []
 
 while True:
     print("1.Ucz model - wersja prosta")
@@ -58,19 +66,19 @@ while True:
     print("5.Zamknij program")
     user = input("")
     if user == '1':
-        results_simple = SimpleClassifier().run(dataset_x,dataset_y,coma_csv)
+        results_simple_balanced , results_simple_mean = SimpleClassifier().run(dataset_x,dataset_y,coma_csv)
     elif user == '2':
-        results_full = FullClassifier().run(dataset_x,dataset_y,coma_csv)
+        results_full_balanced, results_full_mean = FullClassifier().run(dataset_x,dataset_y,coma_csv)
     elif user == '3':
-        results_half = HalfWindowClassifier().run(dataset_x,dataset_y,coma_csv)
+        results_half_balanced, results_half_mean = HalfWindowClassifier().run(dataset_x,dataset_y,coma_csv)
         pass
     elif user == '4':
         print('Simple Classifier')
-        results_simple = SimpleClassifier().run(dataset_x,dataset_y,coma_csv)
+        results_simple_balanced , results_simple_mean = SimpleClassifier().run(dataset_x,dataset_y,coma_csv)
         print('Full Classifier')
-        results_full = FullClassifier().run(dataset_x,dataset_y,coma_csv)
+        results_full_balanced, results_full_mean = FullClassifier().run(dataset_x,dataset_y,coma_csv)
         print('Half Window Classifier')
-        results_half = HalfWindowClassifier().run(dataset_x,dataset_y,coma_csv)
+        results_half_balanced, results_half_mean = HalfWindowClassifier().run(dataset_x,dataset_y,coma_csv)
         print("Saving data to compare...")
         SaveToCSV()
         print("Data saved")

@@ -2,6 +2,7 @@ from collections import Counter
 from queue import Full
 from site import USER_BASE
 from sklearn.ensemble import GradientBoostingClassifier
+from sklearn.metrics import balanced_accuracy_score
 from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
@@ -35,9 +36,10 @@ class FullClassifier:
     
     def run(self, x, y, coma):
         train_scores = []
-        test_scores = []
+        test_scores_balanced = []
+        test_scores_mean = []
         result = 'FullClassifier' + coma + coma + coma + coma + '\n'
-        result += 'Lp' + coma + 'train score' + coma + 'test score\n'
+        result += 'Lp' + coma + 'train score' + coma + 'test score balanced' + coma + 'test score mean\n'
         (
             data_for_train,
             data_for_test,
@@ -53,21 +55,29 @@ class FullClassifier:
 
             cls = GradientBoostingClassifier(n_estimators=2000)
             cls.fit(x_train, y_train)
-            train_score = cls.score(x_train, y_train) # always 1.0
-            test_score = cls.score(x_test, y_test)
-            train_scores.append(train_score) # always 1.0
-            test_scores.append(test_score)
-            result += str(i) + coma +  str(train_score)+coma+str(test_score)+'\n' 
+            y_result = cls.predict(x_train)
+            train_score = balanced_accuracy_score(y_result,y_train)
             print("Train Score for the dataset is about: {}".format(train_score)) # always 1.0
-            print("Test Score for the dataset is about: {}".format(test_score))
+            y_result = cls.predict(x_test)
+            test_score = balanced_accuracy_score(y_result,y_test)
+            print("Balanced Test Score for the dataset is about: {}".format(test_score))
+            
+            train_scores.append(train_score) # always 1.0
+            test_scores_balanced.append(test_score)
+            test_score_mean = cls.score(x_test,y_test)
+            test_scores_mean.append(test_score_mean)
+            print("Mean Test Score for the dataset is about: {}".format(test_score_mean))
+            
+            result += str(i) + coma +  str(train_score)+coma+str(test_score)+ coma+str(test_score_mean) +'\n' 
             print("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
 
         print("Average train Score for the dataset is about: {}".format(np.mean(train_scores))) # always 1.0
-        print("Average test Score for the dataset is about: {}".format(np.mean(test_scores)))        
+        print("Average balanced test Score for the dataset is about: {}".format(np.mean(test_scores_balanced)))
+        print("Average mean test Score for the dataset is about: {}".format(np.mean(test_scores_mean)))   
         file = open('./Result/FullClassifier.csv', 'w+')
         file.write(result)
         
-        return test_scores
+        return test_scores_balanced, test_scores_mean
 
 
 
