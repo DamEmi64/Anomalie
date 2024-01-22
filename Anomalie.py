@@ -13,7 +13,7 @@ from halfWindowClassifier import HalfWindowClassifier
 coma_csv = ';'
 
 def readData():
-    data = sklearn.datasets.load_files('./data/dataset')
+    data = sklearn.datasets.load_files('./data/dataset_half')
     x = []
     y = data.target
     for item in data.data:

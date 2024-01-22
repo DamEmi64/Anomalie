@@ -16,6 +16,26 @@ from frouros.metrics import PrequentialError
 
 class HalfWindowClassifier:
   
+    def readData(self):
+        data = sklearn.datasets.load_files('./data/dataset_half')
+        x = []
+        y = data.target
+        for item in data.data:
+            lines = item.splitlines()
+            numbers = []
+            for line in lines:
+                    try:
+                        numbers.append(float(line))
+                    except :
+                        pass
+            x.append(numbers)
+
+        first_num = int(len(x)/4)
+        last_num = 3 * first_num
+        x = x[first_num:last_num]
+        y = y[first_num:last_num]
+        return train_test_split(x, y, train_size=0.7)
+
     def get_features(self,list_values):
         return [np.var(list_values)] + [scipy.stats.skew(list_values)] + [scipy.stats.kurtosis(list_values)] + [
             np.sum(np.diff(list_values)[1:] * np.diff(list_values)[:-1] < 0)]
@@ -44,10 +64,17 @@ class HalfWindowClassifier:
             data_for_test,
             label_for_train,
             label_for_test,
-        ) = train_test_split(x, y, train_size=0.7)         
+        ) = self.readData()        
         print("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")   
 
-        for i in range(16):
+        for i in range(64):
+                        #to można potem zakometować
+            (
+                data_for_train,
+                data_for_test,
+                label_for_train,
+                label_for_test,
+            ) = train_test_split(x, y, train_size=0.7)
             x_train, y_train = self.transform_data(data_for_train, label_for_train)
             x_test, y_test = self.transform_data(data_for_test, label_for_test)
 

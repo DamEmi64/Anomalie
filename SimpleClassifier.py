@@ -45,7 +45,14 @@ class SimpleClassifier:
             label_for_test,
         ) = train_test_split(x, y, train_size=0.7)       
         print("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
-        for i in range(16):
+        for i in range(64):
+                        #to można potem zakometować
+            (
+                data_for_train,
+                data_for_test,
+                label_for_train,
+                label_for_test,
+            ) = train_test_split(x, y, train_size=0.7)
             x_train, y_train = self.transform_data(data_for_train, label_for_train)
             x_test, y_test = self.transform_data(data_for_test, label_for_test)
 
