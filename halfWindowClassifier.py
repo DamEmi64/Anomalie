@@ -45,7 +45,7 @@ class HalfWindowClassifier:
         ) = train_test_split(x, y, train_size=0.7)         
         print("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")   
 
-        for i in range(10):
+        for i in range(2):
             x_train, y_train = self.transform_data(data_for_train, label_for_train)
             x_test, y_test = self.transform_data(data_for_test, label_for_test)
 
