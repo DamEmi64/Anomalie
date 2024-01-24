@@ -3,7 +3,7 @@ from queue import Full
 from site import USER_BASE
 from sklearn.metrics import balanced_accuracy_score
 from sklearn.ensemble import GradientBoostingClassifier
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import RepeatedStratifiedKFold
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 import pywt
@@ -32,27 +32,39 @@ class SimpleClassifier:
             list_features.append(features)
         return list_features,list_labels
     
+    def split_data(self,x,y):
+        data_for_train = []
+        data_for_test = []
+        label_for_train = []
+        label_for_test = []
+        
+        rskf = RepeatedStratifiedKFold(n_splits=3)
+
+        for i, (train_index, test_index) in enumerate(rskf.split(x, y)):
+            if i == 10:
+                for idx in train_index:
+                    data_for_train.append(x[idx])
+                    label_for_train.append(y[idx])
+                for idx in test_index:
+                    data_for_test.append(x[idx])
+                    label_for_test.append(y[idx])
+        return data_for_train,data_for_test,label_for_train,label_for_test    
+    
     def run(self, x, y, coma):
         train_scores = []
         test_scores_balanced = []
         test_scores_mean = []
         result = 'SimpleClassifier' + coma + coma + coma + coma + '\n'
         result += 'Lp' + coma + 'train score' + coma + 'test score balanced' + coma + 'test score mean\n'
-        (
-            data_for_train,
-            data_for_test,
-            label_for_train,
-            label_for_test,
-        ) = train_test_split(x, y, train_size=0.7)       
         print("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
-        for i in range(64):
+        for i in range(2):
                         #to można potem zakometować
             (
                 data_for_train,
                 data_for_test,
                 label_for_train,
                 label_for_test,
-            ) = train_test_split(x, y, train_size=0.7)
+            ) = self.split_data(x,y)
             x_train, y_train = self.transform_data(data_for_train, label_for_train)
             x_test, y_test = self.transform_data(data_for_test, label_for_test)
 
