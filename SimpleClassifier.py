@@ -57,7 +57,7 @@ class SimpleClassifier:
         result = 'SimpleClassifier' + coma + coma + coma + coma + '\n'
         result += 'Lp' + coma + 'train score' + coma + 'test score balanced' + coma + 'test score mean\n'
         print("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
-        for i in range(2):
+        for i in range(64):
                         #to można potem zakometować
             (
                 data_for_train,

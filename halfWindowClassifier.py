@@ -42,7 +42,7 @@ class HalfWindowClassifier:
         label_for_train = []
         label_for_test = []
         
-        rskf = RepeatedStratifiedKFold(n_splits=3, random_state=42)
+        rskf = RepeatedStratifiedKFold(n_splits=3)
 
         for i, (train_index, test_index) in enumerate(rskf.split(x, y)):
             if i == 10:
@@ -80,7 +80,7 @@ class HalfWindowClassifier:
         x, y = self.readData()
         print("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")   
 
-        for i in range(2):
+        for i in range(64):
                         #to można potem zakometować
             (
                 data_for_train,
